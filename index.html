@@ -18,8 +18,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .lang-btn:hover { background: #1D9E75; color: #fff; }
 .section { background: #fff; border: 1px solid #e8e4dc; border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; }
 .label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
-.timer-display { font-size: 48px; font-weight: 500; color: #1a1a1a; letter-spacing: -1px; line-height: 1; }
-.timer-sub { font-size: 13px; color: #888; margin-top: 6px; }
 .btn { display: inline-block; padding: 8px 20px; border-radius: 8px; border: 1px solid #ccc; background: transparent; color: #1a1a1a; font-size: 14px; cursor: pointer; transition: background 0.15s; }
 .btn:hover { background: #f0ede7; }
 .btn-green { background: #1D9E75; color: #E1F5EE; border-color: #0F6E56; }
@@ -51,12 +49,39 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .mood-entry-time { font-size: 11px; color: #aaa; margin-top: 1px; }
 .milestone { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0ede7; }
 .milestone:last-child { border-bottom: none; }
-.milestone-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; background: #f0ede7; flex-shrink: 0; }
-.milestone-icon.done { background: #E1F5EE; color: #0F6E56; }
+.milestone-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; background: #f0ede7; flex-shrink: 0; }
+.milestone-icon.done { background: #E1F5EE; color: #0F6E56; font-size: 13px; }
 .milestone-text { font-size: 13px; color: #1a1a1a; flex: 1; }
 .milestone-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
 .milestone-badge.done { color: #0F6E56; background: #E1F5EE; }
 .milestone-badge.locked { color: #999; background: #f0ede7; }
+/* Timer */
+.timer-display { font-size: 48px; font-weight: 500; color: #1a1a1a; letter-spacing: -1px; line-height: 1; }
+.timer-sub { font-size: 13px; color: #888; margin-top: 6px; }
+/* Game tabs */
+.game-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+.game-tab { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #e0ddd7; background: #f5f3ee; font-size: 13px; color: #888; cursor: pointer; text-align: center; transition: all 0.15s; }
+.game-tab.active { background: #1D9E75; color: #fff; border-color: #0F6E56; }
+.game-panel { display: none; }
+.game-panel.active { display: block; }
+/* Tic-tac-toe */
+.ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
+.ttt-cell { aspect-ratio: 1; background: #f5f3ee; border-radius: 10px; border: 1px solid #e0ddd7; display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; transition: background 0.12s; user-select: none; }
+.ttt-cell:hover:not(.taken) { background: #eaf3ee; }
+.ttt-cell.taken { cursor: default; }
+.ttt-status { font-size: 14px; color: #1a1a1a; text-align: center; margin-bottom: 10px; font-weight: 500; min-height: 20px; }
+.ttt-scores { display: flex; justify-content: center; gap: 24px; margin-bottom: 12px; }
+.ttt-score { text-align: center; }
+.ttt-score-val { font-size: 22px; font-weight: 500; color: #1a1a1a; }
+.ttt-score-label { font-size: 11px; color: #999; }
+/* Mandala */
+.mandala-wrap { display: flex; flex-direction: column; align-items: center; }
+.mandala-colors { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 14px; }
+.color-swatch { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.12s; }
+.color-swatch:hover { transform: scale(1.15); }
+.color-swatch.selected { border-color: #1a1a1a; transform: scale(1.15); }
+.mandala-svg path, .mandala-svg ellipse, .mandala-svg circle { cursor: pointer; transition: fill 0.15s; stroke: #ccc; stroke-width: 0.5; }
+.mandala-btn-row { display: flex; gap: 8px; margin-top: 12px; }
 </style>
 </head>
 <body>
@@ -74,31 +99,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <button class="lang-btn" id="lang-btn" onclick="toggleLang()">ES</button>
   </div>
 
-  <div class="section">
-    <div class="label" id="lbl-timer">Time unplugged today</div>
-    <div class="timer-display" id="timer">00:00:00</div>
-    <div class="timer-sub" id="timer-status">Start your session to begin tracking</div>
-    <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="btn btn-green" id="startBtn" onclick="toggleTimer()">Start session</button>
-      <button class="btn" id="resetBtn" onclick="resetTimer()">Reset</button>
-    </div>
-    <div class="dot-row" id="dot-row">
-      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-      <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
-    </div>
-    <div class="streak-label" id="streak-label"></div>
-  </div>
-
+  <!-- Activity -->
   <div class="section">
     <div class="label" id="lbl-activity">Activity suggestion</div>
     <div class="activity-card">
       <span class="activity-tag art" id="act-tag">Drawing</span>
       <div class="activity-title" id="act-title">Sketch something in front of you</div>
-      <div class="activity-desc" id="act-desc">Pick any object nearby — a cup, a plant, your hand — and spend 10 minutes drawing it. No rules, just observe.</div>
+      <div class="activity-desc" id="act-desc">Pick any object nearby — a cup, a plant, your hand — and spend 10 minutes drawing it.</div>
     </div>
     <button class="btn" id="shuffleBtn" onclick="shuffleActivity()" style="width:100%;text-align:center">Shuffle another idea</button>
   </div>
 
+  <!-- Mood -->
   <div class="section">
     <div class="label" id="lbl-mood">How do you feel right now?</div>
     <div class="mood-grid">
@@ -114,12 +126,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
   </div>
 
+  <!-- Quote -->
   <div class="section">
     <div class="label" id="lbl-quote">Today's thought</div>
     <div class="quote-text" id="quote-text"></div>
     <div class="quote-author" id="quote-author"></div>
   </div>
 
+  <!-- Milestones -->
   <div class="section">
     <div class="label" id="lbl-milestones">Milestones</div>
     <div class="milestone"><div class="milestone-icon" id="ms0-icon">1h</div><div class="milestone-text" id="ms0">First hour offline</div><div class="milestone-badge locked" id="ms0b">Locked</div></div>
@@ -127,28 +141,82 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="milestone"><div class="milestone-icon" id="ms2-icon">24h</div><div class="milestone-text" id="ms2">Full day unplugged</div><div class="milestone-badge locked" id="ms2b">Locked</div></div>
     <div class="milestone"><div class="milestone-icon" id="ms3-icon">7d</div><div class="milestone-text" id="ms3">7-day streak</div><div class="milestone-badge locked" id="ms3b">Locked</div></div>
   </div>
+
+  <!-- Games -->
+  <div class="section">
+    <div class="label" id="lbl-games">Mini games</div>
+    <div class="game-tabs">
+      <div class="game-tab active" id="tab-ttt" onclick="switchGame('ttt')">⭕ Tic-tac-toe</div>
+      <div class="game-tab" id="tab-mandala" onclick="switchGame('mandala')" id="tab-mandala">🌸 Mandala</div>
+    </div>
+
+    <!-- Tic-tac-toe -->
+    <div class="game-panel active" id="panel-ttt">
+      <div class="ttt-scores">
+        <div class="ttt-score"><div class="ttt-score-val" id="score-x">0</div><div class="ttt-score-label">✕</div></div>
+        <div class="ttt-score"><div class="ttt-score-val" id="score-draw">0</div><div class="ttt-score-label" id="lbl-draw">Draw</div></div>
+        <div class="ttt-score"><div class="ttt-score-val" id="score-o">0</div><div class="ttt-score-label">○</div></div>
+      </div>
+      <div class="ttt-status" id="ttt-status">Your turn — ✕</div>
+      <div class="ttt-board" id="ttt-board"></div>
+      <button class="btn" id="ttt-restart" onclick="tttRestart()" style="width:100%;text-align:center;margin-top:4px">New game</button>
+    </div>
+
+    <!-- Mandala -->
+    <div class="game-panel" id="panel-mandala">
+      <div class="mandala-wrap">
+        <div class="mandala-colors" id="mandala-colors"></div>
+        <svg class="mandala-svg" id="mandala-svg" viewBox="0 0 300 300" width="100%" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="mandala-btn-row">
+          <button class="btn" onclick="mandalaReset()" id="mandala-reset" style="flex:1;text-align:center">Reset</button>
+          <button class="btn btn-green" onclick="mandalaRandom()" id="mandala-random" style="flex:1;text-align:center">Random fill</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timer (at the end) -->
+  <div class="section">
+    <div class="label" id="lbl-timer">Time unplugged today</div>
+    <div class="timer-display" id="timer">00:00:00</div>
+    <div class="timer-sub" id="timer-status">Start your session to begin tracking</div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn btn-green" id="startBtn" onclick="toggleTimer()">Start session</button>
+      <button class="btn" id="resetBtn" onclick="resetTimer()">Reset</button>
+    </div>
+    <div class="dot-row" id="dot-row">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <div class="streak-label" id="streak-label"></div>
+  </div>
 </div>
 
 <script>
+// ── i18n ─────────────────────────────────────────────────────────
 const i18n = {
   en: {
     appName:'Unplug', tagline:'Your offline companion', langBtn:'ES',
     lblTimer:'Time unplugged today', lblActivity:'Activity suggestion',
     lblMood:'How do you feel right now?', lblQuote:"Today's thought",
-    lblMilestones:'Milestones', lblMoodHistory:'Recent moods',
+    lblMilestones:'Milestones', lblMoodHistory:'Recent moods', lblGames:'Mini games',
     moodHistoryEmpty:'No check-ins yet — select a mood above!',
     timerIdle:'Start your session to begin tracking',
     timerRunning:'Session in progress — enjoy the present',
     timerPaused:'Session paused',
     btnStart:'Start session', btnPause:'Pause session', btnResume:'Resume session', btnReset:'Reset',
     btnShuffle:'Shuffle another idea',
-    streakDays: d => d === 1 ? '1-day streak' : `${d}-day streak`,
-    streakZero: 'No streak yet — start today!',
+    streakDays: d => d===1?'1-day streak':`${d}-day streak`,
+    streakZero:'No streak yet — start today!',
     moods:['Calm','Happy','Bored','Restless'],
     moodEmojis:['😌','😁','😐','😟'],
     moodReplies:["That's the spirit. Stay with this feeling.","Being offline looks good on you!","Boredom sparks creativity — try the drawing activity!","Try a short walk. Movement helps settle the mind."],
     msBadgeDone:'Done', msBadgeLocked:'Locked',
     milestones:['First hour offline','3-day streak','Full day unplugged','7-day streak'],
+    tttYourTurn: p=>`Your turn — ${p}`, tttWinPlayer:'You win! 🎉', tttWinCpu:'CPU wins! 🤖', tttDraw:'Draw!',
+    tttRestart:'New game', tttDraw2:'Draw', tttCpuThinking:'CPU thinking...',
+    mandalaReset:'Reset', mandalaRandom:'Random fill',
+    tabTtt:'⭕ Tic-tac-toe', tabMandala:'🌸 Mandala',
     quotes:[
       {text:'"Almost everything will work again if you unplug it for a few minutes — including you."',author:'— Anne Lamott'},
       {text:'"Nature does not hurry, yet everything is accomplished."',author:'— Lao Tzu'},
@@ -157,14 +225,14 @@ const i18n = {
       {text:'"The present moment is the only moment available to us."',author:'— Thich Nhat Hanh'},
     ],
     activities:[
-      {tag:'Drawing',cls:'art',title:'Sketch something in front of you',desc:'Pick any object nearby — a cup, a plant, your hand — and spend 10 minutes drawing it. No rules, just observe.'},
+      {tag:'Drawing',cls:'art',title:'Sketch something in front of you',desc:'Pick any object nearby — a cup, a plant, your hand — and spend 10 minutes drawing it.'},
       {tag:'Drawing',cls:'art',title:'Draw your ideal place',desc:'Close your eyes and imagine your perfect calm spot. Then draw it — real or imaginary.'},
       {tag:'Drawing',cls:'art',title:'Fill a page with patterns',desc:'Draw repetitive shapes, lines or textures. Zentangle-style doodling is meditative and needs zero skill.'},
       {tag:'Drawing',cls:'art',title:'Portrait from memory',desc:'Try drawing the face of someone you love from memory. Focus on the details you remember most.'},
       {tag:'Drawing',cls:'art',title:'One-line drawing challenge',desc:'Draw something without lifting your pen from the paper. Try a face, an animal or your room.'},
       {tag:'Relax',cls:'',title:'Take a 15-minute walk',desc:"Leave your phone behind or put it on airplane mode. Notice five things you haven't paid attention to before."},
       {tag:'Relax',cls:'',title:'Make a cup of tea slowly',desc:'Be fully present — smell the tea, watch it brew, feel the warmth. No rushing.'},
-      {tag:'Relax',cls:'',title:'Write three things you\'re grateful for',desc:'Grab a pen and paper. Think about today specifically — even small things count.'},
+      {tag:'Relax',cls:'',title:"Write three things you're grateful for",desc:'Grab a pen and paper. Think about today specifically — even small things count.'},
       {tag:'Relax',cls:'',title:'Stretch for 10 minutes',desc:'No screen needed. Stretch your neck, shoulders and back. Your body will thank you.'},
       {tag:'Learn',cls:'',title:'Read one chapter of a book',desc:'Any book — fiction, non-fiction, something collecting dust on your shelf.'},
     ],
@@ -173,20 +241,24 @@ const i18n = {
     appName:'Desconectar', tagline:'Tu compañero sin pantallas', langBtn:'EN',
     lblTimer:'Tiempo desconectado hoy', lblActivity:'Sugerencia de actividad',
     lblMood:'¿Cómo te sientes ahora mismo?', lblQuote:'Reflexión del día',
-    lblMilestones:'Logros', lblMoodHistory:'Estados recientes',
+    lblMilestones:'Logros', lblMoodHistory:'Estados recientes', lblGames:'Mini juegos',
     moodHistoryEmpty:'Sin registros aún — ¡elige un estado arriba!',
     timerIdle:'Inicia tu sesión para empezar a registrar',
     timerRunning:'Sesión en curso — disfruta el presente',
     timerPaused:'Sesión pausada',
     btnStart:'Iniciar sesión', btnPause:'Pausar sesión', btnResume:'Reanudar sesión', btnReset:'Reiniciar',
     btnShuffle:'Otra idea al azar',
-    streakDays: d => d === 1 ? 'Racha de 1 día' : `Racha de ${d} días`,
-    streakZero: 'Sin racha aún — ¡empieza hoy!',
+    streakDays: d=>d===1?'Racha de 1 día':`Racha de ${d} días`,
+    streakZero:'Sin racha aún — ¡empieza hoy!',
     moods:['Tranquilo','Feliz','Aburrido','Inquieto'],
     moodEmojis:['😌','😁','😐','😟'],
     moodReplies:['Así se hace. Quédate con esta sensación.','¡Estar desconectado te sienta genial!','El aburrimiento despierta la creatividad — ¡prueba el dibujo!','Prueba a dar un paseo corto. El movimiento calma la mente.'],
     msBadgeDone:'Conseguido', msBadgeLocked:'Bloqueado',
     milestones:['Primera hora sin pantallas','Racha de 3 días','Un día entero desconectado','Racha de 7 días'],
+    tttYourTurn: p=>`Tu turno — ${p}`, tttWinPlayer:'¡Ganaste! 🎉', tttWinCpu:'¡Gana la CPU! 🤖', tttDraw:'¡Empate!',
+    tttRestart:'Nueva partida', tttDraw2:'Empate', tttCpuThinking:'CPU pensando...',
+    mandalaReset:'Borrar', mandalaRandom:'Rellenar al azar',
+    tabTtt:'⭕ Tres en raya', tabMandala:'🌸 Mandala',
     quotes:[
       {text:'"Casi todo vuelve a funcionar si lo desenchufas unos minutos — incluido tú."',author:'— Anne Lamott'},
       {text:'"La naturaleza no tiene prisa y, sin embargo, todo se logra."',author:'— Lao Tzu'},
@@ -195,7 +267,7 @@ const i18n = {
       {text:'"El presente es el único momento en el que podemos vivir."',author:'— Thich Nhat Hanh'},
     ],
     activities:[
-      {tag:'Dibujo',cls:'art',title:'Dibuja algo que tengas delante',desc:'Elige cualquier objeto cercano — una taza, una planta, tu mano — y pasa 10 minutos dibujándolo. Sin reglas, solo observa.'},
+      {tag:'Dibujo',cls:'art',title:'Dibuja algo que tengas delante',desc:'Elige cualquier objeto cercano — una taza, una planta, tu mano — y pasa 10 minutos dibujándolo.'},
       {tag:'Dibujo',cls:'art',title:'Dibuja tu lugar ideal',desc:'Cierra los ojos e imagina tu rincón de calma perfecto. Luego dibújalo — real o imaginario.'},
       {tag:'Dibujo',cls:'art',title:'Rellena una página con patrones',desc:'Dibuja formas repetitivas, líneas o texturas. El zentangle es meditativo y no requiere habilidad.'},
       {tag:'Dibujo',cls:'art',title:'Retrato de memoria',desc:'Intenta dibujar el rostro de alguien que quieras de memoria. Enfócate en los detalles que más recuerdas.'},
@@ -209,209 +281,268 @@ const i18n = {
   }
 };
 
-// ── Storage helpers ──────────────────────────────────────────────
-function save(key, val) { try { localStorage.setItem('unplug_'+key, JSON.stringify(val)); } catch(e){} }
-function load(key, def) { try { const v = localStorage.getItem('unplug_'+key); return v !== null ? JSON.parse(v) : def; } catch(e){ return def; } }
+// ── Storage ───────────────────────────────────────────────────────
+function save(k,v){try{localStorage.setItem('unplug_'+k,JSON.stringify(v));}catch(e){}}
+function load(k,d){try{const v=localStorage.getItem('unplug_'+k);return v!==null?JSON.parse(v):d;}catch(e){return d;}}
 
-// ── State ────────────────────────────────────────────────────────
-let lang = load('lang','en');
-let running = false, interval = null, currentActivity = 0, selectedMood = -1;
+// ── State ─────────────────────────────────────────────────────────
+let lang=load('lang','en'), running=false, interval=null, currentActivity=0, selectedMood=-1;
+const todayKey=()=>new Date().toISOString().slice(0,10);
+let elapsed=(load('day','')===todayKey())?load('elapsed',0):0;
+let activeDays=load('activeDays',[]);
+let moodHistory=load('moodHistory',[]);
 
-const todayKey = () => new Date().toISOString().slice(0,10); // "2026-03-19"
-
-// elapsed seconds for today
-let elapsed = (load('day','') === todayKey()) ? load('elapsed', 0) : 0;
-
-// streak: array of date strings of active days
-let activeDays = load('activeDays', []);
-
-// mood history: array of {idx, ts}
-let moodHistory = load('moodHistory', []);
-
-function pad(n){ return String(n).padStart(2,'0'); }
-
-// ── Timer ────────────────────────────────────────────────────────
+// ── Timer ─────────────────────────────────────────────────────────
+function pad(n){return String(n).padStart(2,'0');}
 function updateDisplay(){
-  const h=Math.floor(elapsed/3600), m=Math.floor((elapsed%3600)/60), s=elapsed%60;
-  document.getElementById('timer').textContent = pad(h)+':'+pad(m)+':'+pad(s);
+  const h=Math.floor(elapsed/3600),m=Math.floor((elapsed%3600)/60),s=elapsed%60;
+  document.getElementById('timer').textContent=pad(h)+':'+pad(m)+':'+pad(s);
 }
-
 function toggleTimer(){
-  running = !running;
-  const t = i18n[lang];
-  const btn = document.getElementById('startBtn'), st = document.getElementById('timer-status');
-  if(running){
-    btn.textContent = t.btnPause;
-    st.textContent = t.timerRunning;
-    markActiveDay();
-    interval = setInterval(()=>{ elapsed++; save('elapsed',elapsed); save('day',todayKey()); checkMilestones(); updateDisplay(); },1000);
-  } else {
-    btn.textContent = t.btnResume;
-    st.textContent = t.timerPaused;
-    clearInterval(interval);
-  }
+  running=!running;
+  const t=i18n[lang],btn=document.getElementById('startBtn'),st=document.getElementById('timer-status');
+  if(running){btn.textContent=t.btnPause;st.textContent=t.timerRunning;markActiveDay();interval=setInterval(()=>{elapsed++;save('elapsed',elapsed);save('day',todayKey());checkMilestones();updateDisplay();},1000);}
+  else{btn.textContent=t.btnResume;st.textContent=t.timerPaused;clearInterval(interval);}
 }
-
 function resetTimer(){
-  running = false; elapsed = 0; clearInterval(interval);
-  save('elapsed',0); save('day','');
-  const t = i18n[lang];
-  document.getElementById('startBtn').textContent = t.btnStart;
-  document.getElementById('timer-status').textContent = t.timerIdle;
-  updateDisplay(); checkMilestones();
+  running=false;elapsed=0;clearInterval(interval);save('elapsed',0);save('day','');
+  const t=i18n[lang];
+  document.getElementById('startBtn').textContent=t.btnStart;
+  document.getElementById('timer-status').textContent=t.timerIdle;
+  updateDisplay();checkMilestones();
 }
 
-// ── Active days & streak ─────────────────────────────────────────
+// ── Streak ────────────────────────────────────────────────────────
 function markActiveDay(){
-  const today = todayKey();
-  if(!activeDays.includes(today)){ activeDays.push(today); save('activeDays', activeDays); }
+  const today=todayKey();
+  if(!activeDays.includes(today)){activeDays.push(today);save('activeDays',activeDays);}
   renderStreak();
 }
-
 function calcStreak(){
-  if(!activeDays.length) return 0;
-  const sorted = [...activeDays].sort();
-  let streak = 1, d = new Date(sorted[sorted.length-1]);
-  for(let i = sorted.length-2; i >= 0; i--){
-    const prev = new Date(sorted[i]);
-    const diff = (d - prev) / 86400000;
-    if(diff === 1){ streak++; d = prev; } else break;
-  }
-  // streak only counts if today or yesterday is included
-  const today = todayKey();
-  const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
-  const last = sorted[sorted.length-1];
-  if(last !== today && last !== yesterday) return 0;
+  if(!activeDays.length)return 0;
+  const sorted=[...activeDays].sort();
+  let streak=1,d=new Date(sorted[sorted.length-1]);
+  for(let i=sorted.length-2;i>=0;i--){const prev=new Date(sorted[i]);if((d-prev)/86400000===1){streak++;d=prev;}else break;}
+  const today=todayKey(),yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10),last=sorted[sorted.length-1];
+  if(last!==today&&last!==yesterday)return 0;
   return streak;
 }
-
 function renderStreak(){
-  const streak = calcStreak();
-  const dots = document.getElementById('dot-row').children;
-  for(let i=0;i<7;i++) dots[i].className = 'dot' + (i < streak ? ' active' : '');
-  const t = i18n[lang];
-  document.getElementById('streak-label').textContent = streak > 0 ? t.streakDays(streak) : t.streakZero;
+  const streak=calcStreak(),dots=document.getElementById('dot-row').children,t=i18n[lang];
+  for(let i=0;i<7;i++)dots[i].className='dot'+(i<streak?' active':'');
+  document.getElementById('streak-label').textContent=streak>0?t.streakDays(streak):t.streakZero;
 }
 
-// ── Mood ─────────────────────────────────────────────────────────
-function selectMood(el, idx){
+// ── Mood ──────────────────────────────────────────────────────────
+function selectMood(el,idx){
   document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedMood = idx;
-  document.getElementById('mood-reply').textContent = i18n[lang].moodReplies[idx];
-  moodHistory.unshift({idx, ts: Date.now()});
-  if(moodHistory.length > 5) moodHistory = moodHistory.slice(0,5);
-  save('moodHistory', moodHistory);
-  renderMoodHistory();
+  el.classList.add('selected');selectedMood=idx;
+  document.getElementById('mood-reply').textContent=i18n[lang].moodReplies[idx];
+  moodHistory.unshift({idx,ts:Date.now()});
+  if(moodHistory.length>5)moodHistory=moodHistory.slice(0,5);
+  save('moodHistory',moodHistory);renderMoodHistory();
 }
-
 function renderMoodHistory(){
-  const t = i18n[lang];
-  const el = document.getElementById('mood-history-list');
-  if(!moodHistory.length){
-    el.innerHTML = `<div class="mood-history-empty">${t.moodHistoryEmpty}</div>`;
-    return;
-  }
-  el.innerHTML = moodHistory.map(entry => {
-    const d = new Date(entry.ts);
-    const dateStr = d.toLocaleDateString(lang === 'en' ? 'en-GB' : 'es-ES', {day:'numeric',month:'short'});
-    const timeStr = d.toLocaleTimeString(lang === 'en' ? 'en-GB' : 'es-ES', {hour:'2-digit',minute:'2-digit'});
-    return `<div class="mood-entry">
-      <div class="mood-entry-emoji">${t.moodEmojis[entry.idx]}</div>
-      <div class="mood-entry-info">
-        <div class="mood-entry-name">${t.moods[entry.idx]}</div>
-        <div class="mood-entry-time">${dateStr} · ${timeStr}</div>
-      </div>
-    </div>`;
+  const t=i18n[lang],el=document.getElementById('mood-history-list');
+  if(!moodHistory.length){el.innerHTML=`<div class="mood-history-empty">${t.moodHistoryEmpty}</div>`;return;}
+  el.innerHTML=moodHistory.map(e=>{
+    const d=new Date(e.ts),loc=lang==='en'?'en-GB':'es-ES';
+    return `<div class="mood-entry"><div class="mood-entry-emoji">${t.moodEmojis[e.idx]}</div><div class="mood-entry-info"><div class="mood-entry-name">${t.moods[e.idx]}</div><div class="mood-entry-time">${d.toLocaleDateString(loc,{day:'numeric',month:'short'})} · ${d.toLocaleTimeString(loc,{hour:'2-digit',minute:'2-digit'})}</div></div></div>`;
   }).join('');
 }
 
-// ── Milestones ───────────────────────────────────────────────────
+// ── Milestones ────────────────────────────────────────────────────
 function checkMilestones(){
-  const streak = calcStreak();
-  const ms = [
-    elapsed >= 3600,
-    streak >= 3,
-    elapsed >= 86400,
-    streak >= 7,
-  ];
-  const t = i18n[lang];
+  const streak=calcStreak(),ms=[elapsed>=3600,streak>=3,elapsed>=86400,streak>=7],t=i18n[lang];
   ms.forEach((done,i)=>{
-    const icon = document.getElementById('ms'+i+'-icon');
-    const badge = document.getElementById('ms'+i+'b');
-    if(done){
-      icon.className = 'milestone-icon done';
-      icon.textContent = '✓';
-      badge.className = 'milestone-badge done';
-      badge.textContent = t.msBadgeDone;
-    } else {
-      icon.className = 'milestone-icon';
-      icon.textContent = ['1h','3d','24h','7d'][i];
-      badge.className = 'milestone-badge locked';
-      badge.textContent = t.msBadgeLocked;
-    }
+    const icon=document.getElementById('ms'+i+'-icon'),badge=document.getElementById('ms'+i+'b');
+    if(done){icon.className='milestone-icon done';icon.textContent='✓';badge.className='milestone-badge done';badge.textContent=t.msBadgeDone;}
+    else{icon.className='milestone-icon';icon.textContent=['1h','3d','24h','7d'][i];badge.className='milestone-badge locked';badge.textContent=t.msBadgeLocked;}
   });
 }
 
-// ── Activity ─────────────────────────────────────────────────────
+// ── Activity ──────────────────────────────────────────────────────
 function setActivity(a){
-  document.getElementById('act-tag').textContent = a.tag;
-  document.getElementById('act-tag').className = 'activity-tag'+(a.cls?' '+a.cls:'');
-  document.getElementById('act-title').textContent = a.title;
-  document.getElementById('act-desc').textContent = a.desc;
+  document.getElementById('act-tag').textContent=a.tag;
+  document.getElementById('act-tag').className='activity-tag'+(a.cls?' '+a.cls:'');
+  document.getElementById('act-title').textContent=a.title;
+  document.getElementById('act-desc').textContent=a.desc;
 }
-
 function shuffleActivity(){
-  const acts = i18n[lang].activities;
-  let next = Math.floor(Math.random()*acts.length);
-  if(next===currentActivity) next=(next+1)%acts.length;
-  currentActivity=next;
-  setActivity(acts[next]);
+  const acts=i18n[lang].activities;let next=Math.floor(Math.random()*acts.length);
+  if(next===currentActivity)next=(next+1)%acts.length;currentActivity=next;setActivity(acts[next]);
 }
 
-// ── Language ─────────────────────────────────────────────────────
+// ── Game tabs ─────────────────────────────────────────────────────
+function switchGame(id){
+  ['ttt','mandala'].forEach(g=>{
+    document.getElementById('tab-'+g).classList.toggle('active',g===id);
+    document.getElementById('panel-'+g).classList.toggle('active',g===id);
+  });
+}
+
+// ── Tic-tac-toe vs CPU (minimax) ──────────────────────────────────
+let tttBoard=Array(9).fill(null),tttOver=false;
+let tttScores={X:0,O:0,D:0};
+const tttWins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+function tttCheckWinner(b){
+  for(const [a,bv,c] of tttWins) if(b[a]&&b[a]===b[bv]&&b[a]===b[c]) return b[a];
+  return b.every(v=>v)?'D':null;
+}
+
+function minimax(b,isMax){
+  const w=tttCheckWinner(b);
+  if(w==='O') return 10;
+  if(w==='X') return -10;
+  if(w==='D') return 0;
+  const scores=[];
+  b.forEach((_,i)=>{ if(!b[i]){ const nb=[...b]; nb[i]=isMax?'O':'X'; scores.push(minimax(nb,!isMax)); } });
+  return isMax?Math.max(...scores):Math.min(...scores);
+}
+
+function cpuMove(){
+  let best=-Infinity,move=0;
+  tttBoard.forEach((_,i)=>{ if(!tttBoard[i]){ const nb=[...tttBoard]; nb[i]='O'; const s=minimax(nb,false); if(s>best){best=s;move=i;} } });
+  tttBoard[move]='O';
+}
+
+function tttRender(){
+  const board=document.getElementById('ttt-board');
+  board.innerHTML=tttBoard.map((v,i)=>`<div class="ttt-cell${v?' taken':''}" onclick="tttClick(${i})">${v==='X'?'✕':v==='O'?'○':''}</div>`).join('');
+}
+
+function tttSetStatus(txt){ document.getElementById('ttt-status').textContent=txt; }
+
+function tttClick(i){
+  if(tttOver||tttBoard[i]) return;
+  const t=i18n[lang];
+  // Player move (X)
+  tttBoard[i]='X';
+  let w=tttCheckWinner(tttBoard);
+  tttRender();
+  if(w){ return tttEnd(w); }
+  // CPU move (O)
+  tttSetStatus(t.tttCpuThinking||'...');
+  setTimeout(()=>{
+    cpuMove();
+    w=tttCheckWinner(tttBoard);
+    tttRender();
+    if(w){ tttEnd(w); }
+    else { tttSetStatus(t.tttYourTurn('✕')); }
+  }, 300);
+}
+
+function tttEnd(w){
+  tttOver=true;
+  const t=i18n[lang];
+  if(w==='D'){ tttScores.D++; tttSetStatus(t.tttDraw); document.getElementById('score-draw').textContent=tttScores.D; }
+  else { tttScores[w]++; tttSetStatus(w==='X'?t.tttWinPlayer:t.tttWinCpu); document.getElementById('score-'+w.toLowerCase()).textContent=tttScores[w]; }
+}
+
+function tttRestart(){
+  tttBoard=Array(9).fill(null); tttOver=false;
+  tttSetStatus(i18n[lang].tttYourTurn('✕'));
+  tttRender();
+}
+
+// ── Mandala ───────────────────────────────────────────────────────
+const palette=['#f5f3ee','#fde8e8','#fde8c8','#fef9c3','#dcfce7','#dbeafe','#ede9fe','#fce7f3','#1D9E75','#7C3AED','#2563EB','#DC2626','#EA580C','#CA8A04','#1a1a1a'];
+let selColor=palette[8]; // default green
+let mandalaFills={};
+
+function buildMandalaColors(){
+  const el=document.getElementById('mandala-colors');
+  el.innerHTML=palette.map((c,i)=>`<div class="color-swatch${c===selColor?' selected':''}" style="background:${c};border-color:${c==='#f5f3ee'?'#ccc':'transparent'}" onclick="pickColor('${c}',this)"></div>`).join('');
+}
+
+function pickColor(c,el){
+  selColor=c;
+  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function buildMandala(){
+  const svg=document.getElementById('mandala-svg');
+  const cx=150,cy=150,rings=[20,38,58,80,104,130],petals=12;
+  let html='';
+  // center circle
+  html+=`<circle id="mp-center" cx="${cx}" cy="${cy}" r="18" fill="${mandalaFills['center']||'#f5f3ee'}" onclick="paintPart('center',this)"/>`;
+  rings.forEach((r,ri)=>{
+    for(let p=0;p<petals;p++){
+      const angle=(2*Math.PI/petals)*p;
+      const nx=cx+r*Math.cos(angle),ny=cy+r*Math.sin(angle);
+      const pR=ri<2?8:ri<4?10:12;
+      const id=`mp-${ri}-${p}`;
+      html+=`<ellipse id="${id}" cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" rx="${pR}" ry="${(pR*0.7).toFixed(1)}" transform="rotate(${(angle*180/Math.PI).toFixed(1)},${nx.toFixed(1)},${ny.toFixed(1)})" fill="${mandalaFills[id]||'#f5f3ee'}" onclick="paintPart('${id}',this)"/>`;
+    }
+  });
+  svg.innerHTML=html;
+}
+
+function paintPart(id,el){
+  mandalaFills[id]=selColor;
+  el.setAttribute('fill',selColor);
+}
+
+function mandalaReset(){
+  mandalaFills={};buildMandala();
+}
+
+function mandalaRandom(){
+  const colors=palette.filter(c=>c!=='#f5f3ee'&&c!=='#1a1a1a');
+  document.querySelectorAll('.mandala-svg ellipse, .mandala-svg circle').forEach(el=>{
+    const c=colors[Math.floor(Math.random()*colors.length)];
+    mandalaFills[el.id]=c;el.setAttribute('fill',c);
+  });
+}
+
+// ── Language ──────────────────────────────────────────────────────
 function applyLang(){
-  const t = i18n[lang];
-  document.title = t.appName;
-  document.getElementById('app-name').textContent = t.appName;
-  document.getElementById('app-tagline').textContent = t.tagline;
-  document.getElementById('lang-btn').textContent = t.langBtn;
-  document.getElementById('lbl-timer').textContent = t.lblTimer;
-  document.getElementById('lbl-activity').textContent = t.lblActivity;
-  document.getElementById('lbl-mood').textContent = t.lblMood;
-  document.getElementById('lbl-quote').textContent = t.lblQuote;
-  document.getElementById('lbl-milestones').textContent = t.lblMilestones;
-  document.getElementById('lbl-mood-history').textContent = t.lblMoodHistory;
-  document.getElementById('resetBtn').textContent = t.btnReset;
-  document.getElementById('shuffleBtn').textContent = t.btnShuffle;
-  const startBtn = document.getElementById('startBtn');
-  startBtn.textContent = running ? t.btnPause : (elapsed>0 ? t.btnResume : t.btnStart);
-  document.getElementById('timer-status').textContent = running ? t.timerRunning : (elapsed>0 ? t.timerPaused : t.timerIdle);
+  const t=i18n[lang];
+  document.title=t.appName;
+  document.getElementById('app-name').textContent=t.appName;
+  document.getElementById('app-tagline').textContent=t.tagline;
+  document.getElementById('lang-btn').textContent=t.langBtn;
+  document.getElementById('lbl-timer').textContent=t.lblTimer;
+  document.getElementById('lbl-activity').textContent=t.lblActivity;
+  document.getElementById('lbl-mood').textContent=t.lblMood;
+  document.getElementById('lbl-quote').textContent=t.lblQuote;
+  document.getElementById('lbl-milestones').textContent=t.lblMilestones;
+  document.getElementById('lbl-mood-history').textContent=t.lblMoodHistory;
+  document.getElementById('lbl-games').textContent=t.lblGames;
+  document.getElementById('resetBtn').textContent=t.btnReset;
+  document.getElementById('shuffleBtn').textContent=t.btnShuffle;
+  document.getElementById('ttt-restart').textContent=t.tttRestart;
+  document.getElementById('lbl-draw').textContent=t.tttDraw2;
+  document.getElementById('mandala-reset').textContent=t.mandalaReset;
+  document.getElementById('mandala-random').textContent=t.mandalaRandom;
+  document.getElementById('tab-ttt').textContent=t.tabTtt;
+  document.getElementById('tab-mandala').textContent=t.tabMandala;
+  const startBtn=document.getElementById('startBtn');
+  startBtn.textContent=running?t.btnPause:(elapsed>0?t.btnResume:t.btnStart);
+  document.getElementById('timer-status').textContent=running?t.timerRunning:(elapsed>0?t.timerPaused:t.timerIdle);
   t.moods.forEach((m,i)=>document.getElementById('mood'+i).textContent=m);
-  if(selectedMood>=0) document.getElementById('mood-reply').textContent = t.moodReplies[selectedMood];
+  if(selectedMood>=0)document.getElementById('mood-reply').textContent=t.moodReplies[selectedMood];
   setActivity(t.activities[currentActivity]);
-  const q = t.quotes[Math.floor(Math.random()*t.quotes.length)];
-  document.getElementById('quote-text').textContent = q.text;
-  document.getElementById('quote-author').textContent = q.author;
+  const q=t.quotes[Math.floor(Math.random()*t.quotes.length)];
+  document.getElementById('quote-text').textContent=q.text;
+  document.getElementById('quote-author').textContent=q.author;
   t.milestones.forEach((m,i)=>document.getElementById('ms'+i).textContent=m);
-  renderStreak();
-  renderMoodHistory();
-  checkMilestones();
+  document.getElementById('ttt-status').textContent=t.tttYourTurn('✕');
+  renderStreak();renderMoodHistory();checkMilestones();
 }
+function toggleLang(){lang=lang==='en'?'es':'en';save('lang',lang);applyLang();}
 
-function toggleLang(){
-  lang = lang==='en'?'es':'en';
-  save('lang',lang);
-  applyLang();
-}
-
-// ── Init ─────────────────────────────────────────────────────────
+// ── Init ──────────────────────────────────────────────────────────
 updateDisplay();
+buildMandalaColors();
+buildMandala();
+tttRender();
 applyLang();
-// restore today's session if exists
-if(load('day','')===todayKey() && elapsed>0){
-  document.getElementById('timer-status').textContent = i18n[lang].timerPaused;
-  document.getElementById('startBtn').textContent = i18n[lang].btnResume;
+if(load('day','')===todayKey()&&elapsed>0){
+  document.getElementById('timer-status').textContent=i18n[lang].timerPaused;
+  document.getElementById('startBtn').textContent=i18n[lang].btnResume;
 }
 </script>
 </body>
